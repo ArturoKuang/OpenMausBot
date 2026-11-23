@@ -10,7 +10,6 @@
     "android": {
       "package": "com.openmausbot.mobile",
       "softwareKeyboardLayoutMode": "resize",
-      "edgeToEdgeEnabled": true,
       "permissions": ["android.permission.CAMERA"],
       "intentFilters": [
         {

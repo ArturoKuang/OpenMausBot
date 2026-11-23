@@ -23,7 +23,7 @@ export interface Palette {
   identity: Record<MausColor, string>;
 }
 
-/** The phone ramp and identity colours from src/styles.css. */
+/** The phone ramp from src/styles.css. */
 export const midnight: Palette = {
   scheme: "dark",
   app: "#141414",
@@ -38,13 +38,13 @@ export const midnight: Palette = {
   bubbleUser: "#5a5a5a",
   bubbleUserInk: "#f5f5f5",
   accent: "#1084fe",
-  accentInk: "#ffffff",
+  accentInk: "#141414",
   success: "#38d591",
   warning: "#ff9800",
   danger: "#ff5667",
   backdrop: "#00000099",
   identity: {
-    green: "#009957", blue: "#377fe6", red: "#d94b52", orange: "#e78531", purple: "#8d69ce", cyan: "#0ea5c6",
+    green: "#009957", blue: "#4b8eec", red: "#d94b52", orange: "#e78531", purple: "#9b7bd6", cyan: "#0ea5c6",
     pink: "#d84f8b", yellow: "#d8a729", teal: "#01a492", coral: "#e5634e", silver: "#a8adb4", chrome: "#b3bac4",
   },
 };

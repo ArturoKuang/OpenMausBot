@@ -87,6 +87,8 @@ function appendDelta(streams: StreamingReply[], itemId: string, delta: string, b
 
 function applyFrame(state: ThreadState, frame: ServerFrame): ThreadState {
   switch (frame.kind) {
+    case "hello":
+      return frame.resumed ? state : { ...state, streams: [], thinking: false, step: null, running: false, turnId: null };
     case "message":
     case "message.patch":
       return frame.threadId === state.threadId ? upsert(state, frame.message) : state;

@@ -108,6 +108,29 @@ describe("EventStream", () => {
     stream.stop();
   });
 
+  it("retries from the pre-gap cursor when the connection drops between a resumed hello and its replay", async () => {
+    const bodies = [controlledStream(), controlledStream()];
+    const { stream, requests, cursors } = harness((_request, index) => ({ ...jsonResponse(200, undefined), body: bodies[index]!.body }), "s1:3");
+
+    stream.start();
+    await settle();
+    bodies[0]!.push('data: {"kind":"hello","cursor":"s1:7","resumed":true}\n\n');
+    await settle();
+    bodies[0]!.end();
+    await settle();
+    await vi.advanceTimersByTimeAsync(1000);
+    await settle();
+
+    expect(requests).toHaveLength(2);
+    expect(requests[1]!.headers["Last-Event-ID"]).toBe("s1:3");
+    expect(cursors).toEqual([]);
+
+    bodies[1]!.push('data: {"kind":"hello","cursor":"s1:7","resumed":true}\n\nid: s1:4\ndata: {"kind":"thread","threadId":"t1","activeLeafId":"m4"}\n\n');
+    await settle();
+    expect(cursors).toEqual(["s1:4"]);
+    stream.stop();
+  });
+
   it("stops for good when the device is unpaired or must update", async () => {
     for (const [status, expected] of [[401, "unpaired"], [426, "update_app"]] as const) {
       const { stream, requests, statuses } = harness(() => jsonResponse(status, { error: "x" }));

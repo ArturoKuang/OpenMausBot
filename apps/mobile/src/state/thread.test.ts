@@ -24,6 +24,21 @@ describe("thread reducer", () => {
     expect(transcriptRows(done).map((row) => row.key)).toEqual(["m1", "m2"]);
   });
 
+  it("drops a half-streamed turn when a replay gap forces a reload", () => {
+    const interrupted = run([
+      loaded("m1"),
+      { type: "frame", frame: runtime(T, { type: "turn.started", turnId: "turn-1" }) },
+      { type: "frame", frame: runtime(T, { type: "item.started", itemType: "tool", itemId: "tool-1" }) },
+      { type: "frame", frame: runtime(T, { type: "content.delta", streamKind: "assistant_text", itemId: "i1", delta: "Partial" }) },
+    ]);
+    const resumed = run([{ type: "frame", frame: { kind: "hello", cursor: "s1:9", resumed: true } }], interrupted);
+    expect(transcriptRows(resumed).map((row) => row.key)).toEqual(["m1", "stream:i1"]);
+
+    const reloaded = run([{ type: "frame", frame: { kind: "hello", cursor: "s2:0", resumed: false } }, loaded("m1", "m2")], interrupted);
+    expect(reloaded).toMatchObject({ running: false, turnId: null, step: null, thinking: false });
+    expect(transcriptRows(reloaded).map((row) => row.key)).toEqual(["m1", "m2"]);
+  });
+
   it("ignores frames for other threads", () => {
     const state = run([
       loaded("m1"),

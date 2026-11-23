@@ -184,7 +184,7 @@ export class EventStream {
     if (frame.kind === "ping") return;
     if (event.id) this.setCursor(event.id);
     if (frame.kind === "hello") {
-      this.setCursor(frame.cursor);
+      if (!frame.resumed) this.setCursor(frame.cursor);
       this.attempt = 0;
       this.options.onStatus("live", 0);
     }
