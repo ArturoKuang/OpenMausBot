@@ -454,6 +454,6 @@ describe("an invited person with no Cloud of their own", () => {
       teams: [{ id: "t", name: "Acme", role: "member", machine: null }], landing: { teamId: "t" } } as never;
     expect(cloudPlanView(account)).toEqual({ kind: "free", invited: true });
     expect(buyOfferAllowed(cloudPlanView(account))).toBe(false);
-    expect(buyOfferAllowed(cloudPlanView({ ...(account as object), landing: undefined } as never))).toBe(true);
+    expect(buyOfferAllowed(cloudPlanView({ ...(account as object), landing: undefined } as never))).toBe(false);
   });
 });

@@ -24,10 +24,10 @@ describe("Boat's credit offer", () => {
     expect(mailto, "a space is %20, never +, which some mail apps show as it is").not.toContain("+");
   });
 
-  it("runs until its end date, and for good while none is set", () => {
+  it("is always disabled (no sponsor offers)", () => {
     const end = Date.UTC(2026, 11, 1);
-    expect(boatOfferRuns(end)).toBe(true);
-    expect(boatOfferRuns(end - 1, { ...BOAT_OFFER, until: end })).toBe(true);
+    expect(boatOfferRuns(end)).toBe(false);
+    expect(boatOfferRuns(end - 1, { ...BOAT_OFFER, until: end })).toBe(false);
     expect(boatOfferRuns(end, { ...BOAT_OFFER, until: end })).toBe(false);
     expect(boatOfferRuns(end + 1, { ...BOAT_OFFER, until: end })).toBe(false);
   });

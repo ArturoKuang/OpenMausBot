@@ -49,35 +49,13 @@ beforeEach(() => {
 afterEach(async () => { await act(async () => root?.unmount()); root = null; host.remove(); vi.unstubAllGlobals(); delete (window as { ogb?: unknown }).ogb; });
 
 describe("Announcements", () => {
-  it("lists everything announced here, newest first, each with its date, words and buttons; an offer that ended says so", async () => {
+  it("omits built-in promo and sponsor announcements", async () => {
+    void TEAMS_NOTICE; void track;
     f.found = found(desktop);
     await open();
     expect(document.querySelector("h1")?.textContent).toBe("Announcements");
-    expect(rows().map(row => row.dataset.announcementItem)).toEqual([card.id, TEAMS_NOTICE, "modelgo-offer-2026-11", "grok-move-2026-11", "whats-new-2026-11",
-      "boat-credit-2026-11", "product-hunt-launch-2026-10", "cloud-trial-intro-v1"]);
-    const teams = rows()[1]!;
-    expect(teams.querySelector("time")?.getAttribute("datetime")).toBe("2026-11-17T00:00:00.000Z");
-    expect(teams.textContent).toContain("Nov 17, 2026");
-    expect(teams.textContent).toContain("MausBot is better with your team");
-    expect(teams.textContent).toContain("Show again");
-    const hunt = rows().find(row => row.dataset.announcementItem === "product-hunt-launch-2026-10")!;
-    expect(hunt.querySelector("[data-announcement-ended]")?.textContent).toBe("Ended");
-    expect(hunt.querySelector("button"), "no button to an offer that is over").toBeNull();
-    const boat = rows().find(row => row.dataset.announcementItem === "boat-credit-2026-11")!;
-    expect([...boat.querySelectorAll("button")].map(button => button.textContent)).toEqual(["Get Boat", "I bought it: claim my $50"]);
-    expect(rows().find(row => row.dataset.announcementItem === "whats-new-2026-11")?.textContent, "the earlier What's new reopens only when it has something for this account")
-      .not.toContain("Show again");
-  });
-
-  it("each button does what its own notice did", async () => {
-    f.found = found(desktop);
-    await open();
-    const row = (id: string) => rows().find(each => each.dataset.announcementItem === id)!;
-    await click([...row("modelgo-offer-2026-11").querySelectorAll("button")].find(button => button.textContent === "Get a ModelGo key"));
-    expect(window.open).toHaveBeenCalledWith(expect.stringContaining("modelgo"), "_blank", "noopener,noreferrer");
-    await click(row("cloud-trial-intro-v1").querySelector("button"));
-    expect(f.dispatch).toHaveBeenCalledWith({ type: "openCloudAdd", source: "app_card" });
-    await click(row(card.id).querySelector("button"));
+    expect(rows().map(row => row.dataset.announcementItem)).toEqual([card.id]);
+    await click(rows()[0]!.querySelector("button"));
     expect(f.dispatch).toHaveBeenCalledWith({ type: "toggleAppSettings", open: true, section: "cloudAccount" });
   });
 
@@ -91,35 +69,7 @@ describe("Announcements", () => {
     expect(markRead).toHaveBeenCalledTimes(1);
   });
 
-  it("a popup's row opens the popup again, outside the notice queue; closing it marks it seen when it wasn't", async () => {
-    f.found = found(browser);
-    await open();
-    await click(rows().find(row => row.dataset.announcementItem === TEAMS_NOTICE)?.querySelector("button"));
-    const popup = document.querySelector("[data-teams-popup]");
-    expect(popup?.getAttribute("data-teams-popup")).toBe("start");
-    expect(track).toHaveBeenCalledWith("whats_new", { action: "seen", slide: "teams", audience: "no_team", campaign: TEAMS_NOTICE });
-    await click([...popup!.querySelectorAll("button")].find(button => button.textContent === "Not now"));
-    expect(document.querySelector("[data-teams-popup]")).toBeNull();
-    expect(f.remembered).toHaveBeenCalledWith(TEAMS_NOTICE, undefined, expect.objectContaining({ team: false }));
 
-    await click(rows().find(row => row.dataset.announcementItem === "grok-move-2026-11")?.querySelector("button"));
-    await click(document.querySelector("[data-grok-move-popup] [data-primary]"));
-    expect(document.querySelector("[data-grok-move-dialog]"), "Let's start opens the move, as from the popup").not.toBeNull();
-  });
-
-  it("on a Team Cloud: its admin's popup invites, a member's only tells; a member's list is Teams alone", async () => {
-    f.state = { config: { team: { id: "team-acme", name: "Acme", cloudPage: "https://admin.openmausbot.com/cloud" } } };
-    f.found = found({ ...browser, team: true, canSave: false, sponsors: false }, { viewer: { hosted: true, canSave: false, teamRole: "member" } });
-    await open();
-    expect(rows().map(row => row.dataset.announcementItem)).toEqual([card.id, TEAMS_NOTICE]);
-    await click(rows()[1]!.querySelector("button"));
-    expect(document.querySelector("[data-teams-popup]")?.getAttribute("data-teams-popup")).toBe("got-it");
-    await act(async () => root?.unmount()); root = null;
-    f.found = found({ ...browser, team: true }, { viewer: { hosted: true, canSave: true, teamRole: "admin" } });
-    await open();
-    await click(rows().find(row => row.dataset.announcementItem === TEAMS_NOTICE)?.querySelector("button"));
-    expect(document.querySelector("[data-teams-popup]")?.getAttribute("data-teams-popup")).toBe("invite");
-  });
 
   it("shows a card's words in the person's language", async () => {
     setLocale("pt-br");
@@ -144,7 +94,7 @@ describe("Announcements", () => {
       desktopApp({ status: "idle" });
       f.found = withReleases();
       await open();
-      expect(rows().map(each => each.dataset.announcementItem).slice(0, 4)).toEqual(["release-0.1.175", card.id, "release-0.1.173", TEAMS_NOTICE]);
+      expect(rows().map(each => each.dataset.announcementItem)).toEqual(["release-0.1.175", card.id, "release-0.1.173"]);
       const latest = row("0.1.175");
       expect(latest.querySelector("time")?.textContent).toBe("Nov 21, 2026");
       expect(latest.textContent).toContain("What's new in 0.1.175");

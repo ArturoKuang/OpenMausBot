@@ -32,18 +32,13 @@ describe.each(["Simple", "Advanced"] as const)("%s Settings → Plan & billing o
     const html = render();
     expect(html).not.toContain("CLOUD_PLAN_MARKER"); expect(html).not.toContain(reachable);
   });
-  it("shows the plan, read only, on the person's own Cloud", () => {
+  it("never shows the Plan & billing page or Cloud buy offer in Settings", () => {
     vi.stubGlobal("window", { ogb: { cloudPlan: plan } });
     fixture.config = { cloudHome: true };
-    const html = render();
-    expect(html).toContain("CLOUD_PLAN_MARKER home"); expect(html).toContain(reachable);
-    expect(html).toContain('data-settings-page-open="plan"');
-  });
-  it("is the full plan page in the app on this computer, with the offer in both modes", () => {
+    expect(render()).not.toContain(reachable);
     vi.stubGlobal("window", { ogb: { cloudAccount: {}, cloudPlan: plan } });
     const html = render();
-    expect(html).toContain("CLOUD_PLAN_MARKER offer");
-    expect(html).not.toContain("CLOUD_PLAN_MARKER home");
-    expect(html).toContain(reachable);
+    expect(html).not.toContain("CLOUD_PLAN_MARKER offer");
+    expect(html).not.toContain(reachable);
   });
 });

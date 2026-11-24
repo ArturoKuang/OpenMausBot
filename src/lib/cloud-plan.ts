@@ -47,8 +47,8 @@ export function cloudPlanView(account: CloudAccountState | null | undefined): Cl
   return account.landing ? { kind: "free", invited: true } : { kind: "free" };
 }
 
-export function buyOfferAllowed(view: CloudPlanView): boolean {
-  return view.kind === "signed-out" || (view.kind === "free" && !view.invited);
+export function buyOfferAllowed(_view: CloudPlanView): boolean {
+  return false;
 }
 
 /** What the X research card offers someone whose server has no plan credential yet: a paying desktop is still connecting
@@ -58,7 +58,7 @@ export function xResearchAction(view: CloudPlanView | null): "connecting" | "sig
   if (!view) return null;
   if (view.kind === "paid") return "connecting";
   if (view.kind === "signed-out" || view.kind === "reauth") return "sign-in";
-  return view.kind === "free" ? "get-pro" : null;
+  return null;
 }
 
 export function cloudPlanLine(view: CloudPlanView): string | null {

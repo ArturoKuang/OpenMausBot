@@ -71,13 +71,14 @@ describe("Settings → General", () => {
     const onUpgrade = vi.fn(), all = { usage: current, upgrade: { busy: null, note: null, onUpgrade } };
     return { html: renderToStaticMarkup(createElement(CloudUsageSettingsView, all)), tree: nodes(CloudUsageSettingsView(all)), onUpgrade };
   };
-  it("lists every allowance with its meter and the plan, and offers each bigger plan", () => {
+  it("lists every allowance with its meter and the plan without Upgrade upsells", () => {
     const { html, tree, onUpgrade } = section(usage({ tier: "starter", upgrades: [{ tier: "max", amount: 9900 }, { tier: "pro", amount: 4900 }] }));
     for (const text of ["MausBot Cloud usage", "What your Starter plan includes this month", "285 of 300 hours", "12,000 of 60,000 characters", "41.2 of 100 GB",
-      "Resets on Nov 1.", "Upgrade to Pro · $49/month", "Upgrade to Max · $99/month"]) expect(html).toContain(text);
+      "Resets on Nov 1."]) expect(html).toContain(text);
     expect(html.match(/role="progressbar"/g)).toHaveLength(3);
-    button(tree, "Upgrade to Max")!.props.onClick();
-    expect(onUpgrade).toHaveBeenCalledWith("max");
+    expect(button(tree, "Upgrade to Pro")).toBeUndefined();
+    expect(button(tree, "Upgrade to Max")).toBeUndefined();
+    void onUpgrade;
   });
   it("on Max says it is the top plan, and a team's plan changes by writing to us", () => {
     expect(section(usage({ tier: "max", upgrades: [] })).html).toContain("You&#x27;re on the top plan.");

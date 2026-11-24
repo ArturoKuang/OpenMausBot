@@ -1,0 +1,40 @@
+{
+  "expo": {
+    "name": "OpenMausBot",
+    "slug": "openmausbot-mobile",
+    "scheme": "openmausbot",
+    "version": "0.1.0",
+    "orientation": "portrait",
+    "userInterfaceStyle": "automatic",
+    "backgroundColor": "#141414",
+    "android": {
+      "package": "com.openmausbot.mobile",
+      "softwareKeyboardLayoutMode": "resize",
+      "permissions": ["android.permission.CAMERA"],
+      "intentFilters": [
+        {
+          "action": "VIEW",
+          "data": [{ "scheme": "openmausbot", "host": "pair" }],
+          "category": ["BROWSABLE", "DEFAULT"]
+        }
+      ]
+    },
+    "plugins": [
+      "expo-secure-store",
+      "expo-status-bar",
+      [
+        "expo-camera",
+        {
+          "cameraPermission": "OpenMausBot uses the camera to scan the pairing code on your computer.",
+          "recordAudioAndroid": false
+        }
+      ],
+      [
+        "expo-build-properties",
+        {
+          "android": { "usesCleartextTraffic": true }
+        }
+      ]
+    ]
+  }
+}

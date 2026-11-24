@@ -29,7 +29,7 @@ import { PHONE_LAYOUT, SIDEBAR_AND_BOT_PANEL_FIT, SIDEBAR_AND_NARROW_PANEL_FIT, 
 import { anySidePanel, botPanelFloats, panelsMovingSidebar, sidebarFoldsForPanel, type OpenSidePanels } from "@/lib/sidebar-fold";
 import { preloadConnectedApps } from "@/lib/connected-apps";
 import {
-  ActivityPanel, AnnouncementsPage, BotSettingsDialog, CloudAddDialog, ComputerPanel, FilesView, InboxPanel, InspectorPanel, KeyboardShortcutsModal, LocalVmWorkspace,
+  ActivityPanel, AnnouncementsPage, BotSettingsDialog, ComputerPanel, FilesView, InboxPanel, InspectorPanel, KeyboardShortcutsModal, LocalVmWorkspace,
   PluginsPanel, preloadScreens, PublishedAppsPage, RemoteAgentSettingsPanel, SkillBurgersPage, RemoteDesktopPanel, RoomPanel, SettingsModal, TeamFilesPage, TeamMapPage, TriggersPage,
 } from "@/components/lazy-screens";
 import { useAdvancedMode } from "@/lib/interface-mode";
@@ -55,7 +55,6 @@ import { useTeamPresence } from "@/state/team-presence";
 import { closeInbox, inboxVersion, useInboxLoader, useInboxPanel, useInboxReady } from "@/state/inbox";
 import { PlacesRail } from "@/components/PlacesRail";
 import { NewLocalFromMenu } from "@/components/PlaceAddSheet";
-import { CloudHowTo } from "@/components/CloudHowTo";
 import { DesktopCapabilitiesProvider, useCaptionChrome, useDesktopCapabilities, WindowDragStrip, windowFramed } from "@/components/DesktopCapabilities";
 import { WindowCaptionButtons } from "@/components/WindowCaptionButtons";
 import { WindowFrameBar } from "@/components/WindowFrameBar";
@@ -519,8 +518,6 @@ function Shell({ viewer }: { viewer: WelcomeViewer | null }) {
       </div>
       </div>
       {state.appSettingsOpen && <SettingsModal />}
-      {cloudAddOpened.current && <CloudAddDialog />}
-      <CloudHowTo />
       <CloudSetup viewer={viewer} welcomeShown={welcomeOnScreen} />
       <WelcomeKeeper viewer={viewer} />
       {state.pluginsOpen && (team && viewer?.canSave === false ? <MemberApps /> : <PluginsPanel />)}

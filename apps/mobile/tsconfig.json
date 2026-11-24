@@ -1,0 +1,16 @@
+{
+  "extends": "expo/tsconfig.base",
+  "compilerOptions": {
+    "strict": true,
+    "noUnusedLocals": true,
+    "noUnusedParameters": true,
+    "noFallthroughCasesInSwitch": true,
+    "allowImportingTsExtensions": true,
+    "paths": {
+      "@openmausbot/phone-protocol/*": ["../../packages/phone-protocol/src/*"],
+      "zod": ["./node_modules/zod"],
+      "croner": ["./node_modules/croner"]
+    }
+  },
+  "include": ["index.ts", "src", "vitest.config.ts"]
+}

@@ -13,7 +13,8 @@ export function schedulePlace({ cloudHome, local, plan, ready, offersAllowed }: 
   if (cloudHome) return { kind: "cloud" };
   if (!local) return { kind: "server" };
   if (plan?.kind === "paid") return { kind: "local", next: ready ? "open-cloud" : null };
-  return { kind: "local", next: plan && offersAllowed && buyOfferAllowed(plan) ? "add-cloud" : null };
+  void plan; void offersAllowed; void buyOfferAllowed;
+  return { kind: "local", next: null };
 }
 
 export function RoutineScheduleNote() {

@@ -1,7 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 import { createPortal } from "react-dom";
-import { ArrowUpRight, X } from "lucide-react";
-import { CLOUD_PLAN_URL } from "@/lib/app-links";
+import { X } from "lucide-react";
 import { botRoom, closeBotLimit, planRefusal, showBotLimit, useBotLimitReason, useCreatedPausedBot, type BotLimitReason } from "@/lib/bot-limit";
 import { cloudPlanLabel } from "@/lib/cloud-plan";
 import { cn } from "@/lib/cn";
@@ -10,8 +9,8 @@ import { useStore } from "@/state/store";
 import { MausAvatar } from "./Avatar";
 import { AwakeBotsPicker } from "./AwakeBotsPicker";
 import { useCloudPlanSnapshot } from "./CloudTrialNotice";
-import { NoteLine, UpgradeButton, usageBridge, useUpgrade } from "./CloudUsageMeter";
-import { LinkButton, NotNowButton, PRIMARY_BUTTON } from "./NoticeCard";
+import { NoteLine, usageBridge, useUpgrade } from "./CloudUsageMeter";
+import { NotNowButton, PRIMARY_BUTTON } from "./NoticeCard";
 
 const POPUP = "[data-bot-limit-popup]";
 const TITLE = "bot-limit-title";
@@ -38,7 +37,6 @@ function BotLimitDialog({ reason, created, onClose }: { reason: BotLimitReason; 
   const plan = useCloudPlanSnapshot(bridge);
   const usage = plan?.status === "paid" ? plan.usage ?? null : null;
   const [upgraded, setUpgraded] = useState<string | null>(null);
-  const [planFailed, setPlanFailed] = useState(false);
   const upgrade = useUpgrade(bridge, usage, "app_usage", setUpgraded, LAYER);
   const confirming = upgrade.confirming;
   // The Admin tells this Cloud about a new plan within a minute; until then the plan page and this Cloud disagree.
@@ -95,18 +93,7 @@ function BotLimitDialog({ reason, created, onClose }: { reason: BotLimitReason; 
           {picking && <AwakeBotsPicker limit={awake} onSaved={onClose} {...(reason === "created" && created ? { swapIn: created } : {})} />}
           {settled ? (
             <button type="button" onClick={onClose} className={cn(PRIMARY_BUTTON, "mt-5 w-full justify-center")}>{t("roomCard.gotIt")}</button>
-          ) : usage ? (
-            <div className="mt-5 w-full">
-              <UpgradeButton usage={usage} upgrade={{ busy: upgrade.busy, note: upgrade.note, onUpgrade: upgrade.start }} className="w-full justify-center" />
-            </div>
-          ) : !bridge ? (
-            <div className="mt-5 w-full [&>div]:w-full"><LinkButton url={CLOUD_PLAN_URL} label={t("botLimit.openPlan")} className={cn(PRIMARY_BUTTON, "w-full justify-center")} /></div>
-          ) : plan !== null ? (
-            <button type="button" className={cn(PRIMARY_BUTTON, "mt-5 w-full justify-center")} onClick={() => { setPlanFailed(false); void bridge.manage().then(onClose, () => setPlanFailed(true)); }}>
-              {t("botLimit.openPlan")}<ArrowUpRight size={14} aria-hidden="true" />
-            </button>
           ) : null}
-          {planFailed && <p role="alert" className="mt-2 text-[12px] text-danger">{t("notice.openFailed")}</p>}
           {upgrade.note && !upgraded && <div className="mt-2"><NoteLine note={upgrade.note} /></div>}
           {!settled && <div className="mt-1"><NotNowButton onClick={onClose} /></div>}
           <button type="button" onClick={onClose} aria-label={t("common.close")} className="ui-icon-button absolute end-3 top-3"><X size={16} /></button>
