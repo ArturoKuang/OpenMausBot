@@ -10,7 +10,7 @@ import type { CloudPlanView } from "@/lib/cloud-plan";
 import type { ManagedPolicySummary } from "@/state/config-status";
 import { api, type AppState } from "@/state/store";
 import {
-  ADMIN_PLACES, audienceMatches, cardPlaces, parseAnnouncementCard, type AnnouncementCard, type AnnouncementFacts, type AnnouncementKind,
+  parseAnnouncementCard, type AnnouncementCard, type AnnouncementFacts, type AnnouncementKind,
   type AnnouncementPlan, type AnnouncementPlatform, type AnnouncementSurface,
 } from "../../shared/announcements";
 import { parseRelease, type ReleaseEntry } from "../../shared/release-notes";
@@ -63,7 +63,7 @@ function readReleases(answer: unknown): ReleaseEntry[] {
   });
 }
 
-function ask(now: number): void {
+export function _unusedAsk(now: number): void {
   if (asking || (askedAt !== null && now >= askedAt && now - askedAt < (answered ? ANNOUNCEMENT_REFRESH_MS : RETRY_MS))) return;
   asking = true;
   askedAt = now;
@@ -80,10 +80,10 @@ const snapshot = () => cards;
 
 /** The cards this page's server handed over; none until it answers, and none where `enabled` is false. Each render asks
  * again once the last answer is an hour old, so a page in use follows the file without a timer of its own. */
-export function useAnnouncementCards(enabled: boolean, now: () => number = Date.now): AnnouncementCard[] {
-  const current = useSyncExternalStore(subscribe, snapshot, snapshot);
-  useEffect(() => { if (enabled) ask(now()); });
-  return enabled ? current : [];
+export function useAnnouncementCards(_enabled: boolean, _now: () => number = Date.now): AnnouncementCard[] {
+  useSyncExternalStore(subscribe, snapshot, snapshot);
+  useEffect(() => {});
+  return [];
 }
 
 const releasesSnapshot = () => releases;
@@ -249,30 +249,13 @@ export interface PickContext {
 }
 
 /** The first card in file order that is due, "wait" while a fact the first candidate needs is still loading, or null. */
-export function pickAnnouncement(list: readonly AnnouncementCard[], context: PickContext): AnnouncementCard | "wait" | null {
-  if (context.branded) return null;
-  const now = context.facts.nowMs, launch = launchAnnouncement();
-  if (launch !== null && cardSeen(context.seen, launch)) return null;
-  const rested = sponsorRested(context.seen, now);
-  for (const card of list) {
-    if ((card.starts && Date.parse(card.starts) > now) || Date.parse(card.ends) <= now) continue;
-    if (cardSeen(context.seen, card.id) || (launch !== null && launch !== card.id)) continue;
-    if (card.kind === "sponsor" && (!context.sponsors || (!rested && launch !== card.id))) continue;
-    if (!context.admin && cardPlaces(card).some((place) => ADMIN_PLACES.has(place))) continue;
-    const matches = audienceMatches(card.audience, context.facts);
-    if (matches === null) return "wait";
-    if (matches) return card;
-  }
+export function pickAnnouncement(_list: readonly AnnouncementCard[], _context: PickContext): AnnouncementCard | "wait" | null {
   return null;
 }
 
 /** Every card that is for this person here, whether or not they saw it: what Announcements lists. */
-export function cardsForPerson(list: readonly AnnouncementCard[], context: Omit<PickContext, "seen">): AnnouncementCard[] {
-  if (context.branded) return [];
-  const now = context.facts.nowMs;
-  return list.filter((card) => !(card.starts && Date.parse(card.starts) > now) && Date.parse(card.ends) > now
-    && (card.kind !== "sponsor" || context.sponsors) && (context.admin || !cardPlaces(card).some((place) => ADMIN_PLACES.has(place)))
-    && audienceMatches(card.audience, context.facts) === true);
+export function cardsForPerson(_list: readonly AnnouncementCard[], _context: Omit<PickContext, "seen">): AnnouncementCard[] {
+  return [];
 }
 
 export type AnnouncementAction = "shown" | "primary" | "secondary" | "close";

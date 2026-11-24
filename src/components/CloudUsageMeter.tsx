@@ -10,10 +10,9 @@ import { localDesktopPage } from "./onboarding/WelcomeGate";
 import { cloudPlanLabel } from "@/lib/cloud-plan";
 import { cn } from "@/lib/cn";
 import { t } from "@/lib/i18n";
-import { useAdvancedMode } from "@/lib/interface-mode";
 import {
-  includedUsePercent, meterAmounts, meterBand, meterLabel, meterPercent, nextPlan, readUsageCardDismissed, rememberUsageCardDismissed, resetLine,
-  upgradeConfirmBody, upgradeLabel, upgradePath, usageCardView, type MeterBand,
+  includedUsePercent, meterAmounts, meterBand, meterLabel, meterPercent, nextPlan, resetLine,
+  upgradeConfirmBody, upgradePath, type MeterBand,
 } from "@/lib/usage-meter";
 import type { LocaleKey } from "@/locales";
 import { useStore } from "@/state/store";
@@ -178,20 +177,7 @@ export function CloudUsageCardView({ usage, meters, band, upgrade, onHide, onSee
 }
 
 export function CloudUsageCard() {
-  const { dispatch } = useStore();
-  const advanced = useAdvancedMode();
-  const { usage, bridge, teamHome } = useCloudUsage();
-  const [dismissed, setDismissed] = useState(readUsageCardDismissed);
-  const upgrade = useUpgrade(bridge, usage, "app_usage");
-  const view = usageCardView({ usage, teamHome, dismissed });
-  if (!view || !usage) return null;
-  const hide = () => { rememberUsageCardDismissed(view.dismissKey); setDismissed(view.dismissKey); };
-  return (
-    <CloudUsageCardView usage={usage} meters={view.meters} band={view.band} upgrade={{ busy: upgrade.busy, note: upgrade.note, onUpgrade: upgrade.start }}
-      onHide={hide} onSeeAll={() => dispatch({ type: "toggleAppSettings", open: true, section: advanced ? "general" : "usage" })}>
-      {upgrade.dialog}
-    </CloudUsageCardView>
-  );
+  return null;
 }
 
 function MeterList({ usage }: { usage: CloudUsage }) {
@@ -203,12 +189,8 @@ function TopPlanNote({ usage }: { usage: CloudUsage }) {
   return <p className="text-[13px] text-ink-secondary">{t(TEAM_TIERS.includes(usage.tier) ? "usageMeter.teamPlan" : "usageMeter.topPlan")}</p>;
 }
 
-function OtherPlans({ usage, upgrade }: { usage: CloudUsage; upgrade: UpgradeUi }) {
-  if (upgradePath(usage) !== "app") return null;
-  return <>{[...usage.upgrades].sort((a, b) => a.amount - b.amount).slice(1).map((other) => (
-    <button key={other.tier} type="button" disabled={upgrade.busy !== null} onClick={() => upgrade.onUpgrade(other.tier)}
-      className="cursor-pointer text-[13px] text-ink-secondary underline underline-offset-2 hover:text-ink disabled:opacity-50">{upgradeLabel(other)}</button>
-  ))}</>;
+function OtherPlans(_props: { usage: CloudUsage; upgrade: UpgradeUi }) {
+  return null;
 }
 
 export function CloudUsageSettingsView({ usage, upgrade, children }: { usage: CloudUsage; upgrade: UpgradeUi; children?: ReactNode }) {
@@ -241,16 +223,8 @@ export function CloudUsageSettings() {
   return <CloudUsageSettingsView usage={usage} upgrade={upgrade}>{dialog}</CloudUsageSettingsView>;
 }
 
-export function UpgradeButton({ usage, upgrade, className, secondary = false }: { usage: CloudUsage; upgrade: UpgradeUi; className?: string; secondary?: boolean }) {
-  const path = upgradePath(usage), target = nextPlan(usage);
-  if (path === "top") return null;
-  return (
-    <button type="button" className={cn("ui-button gap-1.5", !secondary && "ui-button-primary", className)} disabled={upgrade.busy !== null} onClick={() => upgrade.onUpgrade()}>
-      {upgrade.busy === "preview" && <Loader2 size={13} className="animate-spin" aria-hidden="true" />}
-      {target ? upgradeLabel(target) : t("usageMeter.upgrade")}
-      {path === "browser" && <ArrowUpRight size={13} aria-hidden="true" />}
-    </button>
-  );
+export function UpgradeButton(_props: { usage: CloudUsage; upgrade: UpgradeUi; className?: string; secondary?: boolean }) {
+  return null;
 }
 
 const SUMMARY_BAR: Record<MeterBand, string> = { ok: "bg-ink/80", near: "bg-warning", full: "bg-danger" };

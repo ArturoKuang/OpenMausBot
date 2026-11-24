@@ -1,6 +1,4 @@
-import { ArrowUpRight } from "lucide-react";
 import { t } from "@/lib/i18n";
-import { CLOUD_PLAN_URL } from "@/lib/app-links";
 import { productName } from "@/lib/brand";
 import { api } from "@/state/store";
 import { useStoreDispatch, useStoreSelector } from "@/state/store-select";
@@ -14,7 +12,6 @@ import { OrganizationSettings } from "../../OrganizationSettings";
 import { useSheetOffered } from "../../AccountMenu";
 import { PlacesTogetherSwitch } from "../../PlacesTogetherSwitch";
 import { SettingRow, SettingsGroup, SettingsLinkRow, SettingsRows } from "../../SettingsPrimitives";
-import { UpdatesConsentRow } from "../../UpdatesConsent";
 import { useAccountSummary, useYou } from "../account-summary";
 import { useSettingsShell } from "../settings-shell";
 import { SpentRow } from "../plan-parts";
@@ -81,11 +78,6 @@ export function AccountPage() {
         <SettingsRows><InertRow title={t("settings.account.orgSignIn")} control={<button type="button" className="ui-button" tabIndex={-1}>{t("settings.account.signIn")}</button>} /></SettingsRows>
       </SettingsGroup>
     )}
-    {ctx.desktop && !ctx.client && window.ogb?.updatesConsent && (
-      <SettingsGroup label={t("settings.account.emails", { app: productName() })} block="emails">
-        <SettingsRows><UpdatesConsentRow /></SettingsRows>
-      </SettingsGroup>
-    )}
   </>;
 }
 
@@ -93,23 +85,11 @@ export function PlanPage() {
   const { ctx, place } = useSettingsShell();
   const linkRequest = useStoreSelector((state) => state.appSettingsCloudLink), teamHome = useStoreSelector((state) => state.config?.team), dispatch = useStoreDispatch();
   const { usage, upgrade, dialog } = useCloudUsageSettings();
-  if (!ctx.desktop) {
-    return (
-      <SettingsGroup block="plan">
-        <SettingsRows>
-          <SettingRow title={t("settings.plan.browserTitle")} subtitle={t("settings.plan.browserLine", { app: productName() })}>
-            <a className="ui-button ui-button-primary inline-flex items-center gap-1" href={CLOUD_PLAN_URL} target="_blank" rel="noreferrer">{t("settings.plan.openBilling")}<ArrowUpRight size={12} aria-hidden="true" /></a>
-          </SettingRow>
-        </SettingsRows>
-      </SettingsGroup>
-    );
-  }
+  if (!ctx.desktop) return null;
   return <>
     <CloudAccountSettings part="plan" advanced={ctx.advanced} cloudHome={ctx.cloud} teamHome={teamHome} linkRequest={linkRequest}
       usage={usage} upgrade={upgrade}
-      // A Cloud's own cost stays off its paid plan's card (§1.3: it must never read as a second bill).
       extra={!ctx.advanced && !ctx.client && !(ctx.team && !ctx.admin) && (place.kind === "computer" || place.kind === "server") ? <SpentRow place={place.name} /> : undefined}
-      onAddCloud={() => dispatch({ type: "openCloudAdd", source: "app_settings" })}
       onSignIn={() => dispatch({ type: "openCloudAdd", source: "app_settings", signIn: true })} />
     <PlacesTogetherSwitch />
     {dialog}

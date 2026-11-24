@@ -6,7 +6,7 @@ describe("xResearchAction", () => {
     expect(xResearchAction({ kind: "paid", label: "Pro", checking: false })).toBe("connecting");
     expect(xResearchAction({ kind: "signed-out" })).toBe("sign-in");
     expect(xResearchAction({ kind: "reauth", label: "Pro", reason: "expired" })).toBe("sign-in");
-    expect(xResearchAction({ kind: "free" })).toBe("get-pro");
+    expect(xResearchAction({ kind: "free" })).toBeNull();
   });
 
   it("offers nothing where buying is not right or the state is not known, and without a desktop bridge", () => {

@@ -3,7 +3,7 @@
 import { join } from "node:path";
 
 import bundledFeedJson from "../../announcements/announcements.json" with { type: "json" };
-import { ANNOUNCEMENTS_URL, liveCards, parseAnnouncementFeed, type AnnouncementCard, type AnnouncementFeed } from "../../shared/announcements.ts";
+import { ANNOUNCEMENTS_URL, parseAnnouncementFeed, type AnnouncementCard, type AnnouncementFeed } from "../../shared/announcements.ts";
 import { DATA_DIR } from "../config.ts";
 import {
   ANNOUNCEMENTS_DISABLE_ENV, REMOTE_FILE_FETCH_TIMEOUT_MS, REMOTE_FILE_FIRST_WAIT_MS, REMOTE_FILE_RETRY_MS, REMOTE_FILE_TTL_MS, RemoteJsonFile,
@@ -46,9 +46,13 @@ export class AnnouncementStore extends RemoteJsonFile<AnnouncementFeed> {
     });
   }
 
-  /** What a page is handed: nothing when switched off, else the cards whose time has not passed. */
+  override get disabled(): boolean {
+    return true;
+  }
+
+  /** Announcement cards are disabled in this build. */
   cards(): AnnouncementCard[] {
-    return this.disabled ? [] : liveCards(this.current().cards, this.now);
+    return [];
   }
 
   /** A page's ask: the cards now, after waiting a moment for a first download only when nothing was ever fetched. */

@@ -5,12 +5,12 @@ import { useStore } from "@/state/store";
 import { buyOfferAllowed, cloudPlanLine, cloudPlanView, moneyBackLine, offerTrialDays, usd, type CloudPlanView } from "@/lib/cloud-plan";
 import { useCloudOffer } from "@/lib/use-cloud-offer";
 import { t } from "@/lib/i18n";
-import { SettingRow, SettingsLinkRow } from "./SettingsPrimitives";
+import { SettingRow } from "./SettingsPrimitives";
 import { UpgradeButton, type UpgradeUi } from "./CloudUsageMeter";
 import type { CloudUsage } from "../../electron/cloud-home.mjs";
 
-export function proOfferAvailable(account: CloudAccountState | null): boolean {
-  return buyOfferAllowed(cloudPlanView(account));
+export function proOfferAvailable(_account: CloudAccountState | null): boolean {
+  return false;
 }
 
 export function useCloudPlan(): { view: CloudPlanView; account: CloudAccountState | null } | null {
@@ -110,8 +110,7 @@ export function CloudPlanFootnote() {
   return [t("pro.disclaimer"), moneyBackLine(offer)].filter(Boolean).join(" ");
 }
 
-/** Plan & billing's own row for the plans on offer. */
+/** Plan & billing's own row for the plans on offer (disabled). */
 export function ProCompareRow() {
-  const { dispatch } = useStore();
-  return <SettingsLinkRow title={t("pro.seePlans")} onClick={() => dispatch({ type: "openCloudAdd", source: "app_settings" })} data={{ "data-plan-compare": "" }} />;
+  return null;
 }

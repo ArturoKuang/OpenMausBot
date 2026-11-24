@@ -74,6 +74,10 @@ export function useCloudRoom(): { snapshot: CloudPlanSnapshot | null; bridge: Cl
  * Upgrade is the usual one (its preview, then the person's confirmation); Not now holds it back (the Admin, for two weeks).
  */
 export function CloudRoomCard() {
+  return null;
+}
+
+export function _unusedCloudRoomCard() {
   const { state } = useStore();
   const { snapshot, bridge, teamHome } = useCloudRoom();
   const usage = snapshot?.status === "paid" ? snapshot.usage ?? null : null;

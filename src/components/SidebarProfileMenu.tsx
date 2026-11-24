@@ -5,7 +5,6 @@ import {
   ArrowDownToLine,
   ArrowLeftRight,
   Check,
-  CreditCard,
   Cloud,
   FolderOpen,
   Info,
@@ -57,11 +56,9 @@ import type { CloudPlanSnapshot } from "../../electron/cloud-account.mjs";
 import { activeLocale, t } from "@/lib/i18n";
 import { FEEDBACK_URL, HELP_CENTER_URL, RELEASES_URL, appVersion, openExternalLink } from "@/lib/app-links";
 import { pageIsThisComputer } from "@/lib/companion-bridge";
-import { cloudPlanLabel } from "@/lib/cloud-plan";
 import { shortcutLabel } from "./ShortcutHint";
-import { useAnnouncements } from "./announcements/use-announcements";
 import { useOtherServerName } from "@/lib/other-server";
-import { isOwnerOrAdmin, profileForSession, readSessionState, type SessionState } from "@/lib/session";
+import { profileForSession, readSessionState, type SessionState } from "@/lib/session";
 import {
   cloudPhoneDestination,
   phonePairingSettingsAction,
@@ -575,15 +572,11 @@ export function SidebarProfileMenu({ iconOnly = false, rail = false, circle = fa
   const besideRail = railShown(usePlaces());
   const filesReady = useCloudFilesReady();
   const desktop = Boolean(window.ogb);
-  const planHere = !remote && (desktop ? Boolean(window.ogb?.cloudAccount || (window.ogb?.cloudPlan && state.config?.cloudHome === true))
-    : state.config?.cloudHome === true && !state.config?.team && isOwnerOrAdmin(session));
   const openSettings = (section: AppSettingsSection) => dispatch({ type: "toggleAppSettings", open: true, section });
-  const move = useAccountMove(state.config?.cloudHome === true, { onOpen: () => openSettings("plan"), onPairPhone: () => dispatch(phonePairingSettingsAction()) });
+  const move = useAccountMove(state.config?.cloudHome === true, { onOpen: () => openSettings("account"), onPairPhone: () => dispatch(phonePairingSettingsAction()) });
   const accounts = useAccounts();
-  const news = useAnnouncements();
   const openSource = desktop && !window.ogb?.cloudAccount && !window.ogb?.cloudPlan;
-  const planLine = !desktop ? undefined : cloudUsage ? t("sidebar.menu.plan.used", { plan: summary.plan ?? cloudPlanLabel(planSnapshot?.tier), percent: cloudUsage.value.replace(/\D+/g, "") })
-    : summary.signedIn === false || summary.plan === t("settings.account.free") ? t("sidebar.menu.plan.free") : summary.plan ?? undefined;
+  void planSnapshot; void cloudUsage;
 
   const items = profileMenuItems({
     phone: remote ? null : phoneDevicesItem(phoneState, place.name, () => openSettings("phone")),
@@ -596,7 +589,7 @@ export function SidebarProfileMenu({ iconOnly = false, rail = false, circle = fa
       avatar: <InitialsAvatar initials={profileInitials(profile)} avatarUrl={profile?.avatarUrl} size={32} fontSize={13} className="bg-ink/[0.08]" />,
       onOpen: () => openSettings("account"),
     },
-    plan: planHere ? { key: "plan", label: t("settings.page.plan"), ...(planLine ? { subtitle: planLine } : {}), icon: <CreditCard size={16} />, onSelect: () => openSettings("plan") } : null,
+    plan: null,
     switchPlace: !besideRail && desktop && !remote && window.ogb?.workspaces && account?.place.switchable
       ? { key: "switch-place", label: t("sidebar.menu.switchPlace"), icon: <ArrowLeftRight size={16} />, chevron: true, onSelect: account.place.openMenu } : null,
     accounts: accountMenuItems(accounts),
@@ -622,7 +615,7 @@ export function SidebarProfileMenu({ iconOnly = false, rail = false, circle = fa
     onHelp: () => void openExternalLink(HELP_CENTER_URL),
     onFeedback: () => void openExternalLink(FEEDBACK_URL),
     onWhatsNew: () => void openExternalLink(RELEASES_URL),
-    announcements: { unread: news.unread, active: state.activeView === "announcements", onSelect: () => dispatch({ type: "showAnnouncements" }) },
+    announcements: null,
     // Every Sign out asks first: "Sign out of MausBot?" and what keeps running.
     signOut: accounts.view?.active ? null
       : !desktop && session?.kind === "session" ? () => setSigningOut("browser")
@@ -635,10 +628,10 @@ export function SidebarProfileMenu({ iconOnly = false, rail = false, circle = fa
   const needsYou = account?.automationsNeedYou === true;
   const initials = profileInitials(profile);
   const nameless = simple && initials === "?" ? <UserRound size={16} aria-hidden /> : undefined;
-  const label = accountLabel(name, { automationsNeedYou: needsYou, update: simple && noteworthy && update ? update.label : null, move: move.kind, announcements: news.unread });
-  const dot = accountDot({ automationsNeedYou: needsYou, update: noteworthy ? (update.phase === "error" ? "failed" : "news") : null, move: move.kind, announcements: news.unread });
-  // Advanced's full row has its own update badge: its avatar's dot is the move's and the announcements' alone.
-  const moveDot = accountDot({ automationsNeedYou: false, update: null, move: move.kind, announcements: news.unread });
+  const label = accountLabel(name, { automationsNeedYou: needsYou, update: simple && noteworthy && update ? update.label : null, move: move.kind, announcements: false });
+  const dot = accountDot({ automationsNeedYou: needsYou, update: noteworthy ? (update.phase === "error" ? "failed" : "news") : null, move: move.kind, announcements: false });
+  // Advanced's full row has its own update badge: its avatar's dot is the move's alone.
+  const moveDot = accountDot({ automationsNeedYou: false, update: null, move: move.kind, announcements: false });
 
   return (
     <>

@@ -77,7 +77,7 @@ describe("the Settings window", () => {
     expect(render("appearance")).toContain("MausBot on this device");
   });
 
-  const SIMPLE_NAV = ["overview", "phone", "ai", "vault", "usage", "transfer", "account", "plan", "app", "appearance"];
+  const SIMPLE_NAV = ["overview", "phone", "ai", "vault", "usage", "transfer", "account", "app", "appearance"];
   const SIMPLE_PEOPLE: Array<[string, () => void]> = [
     ["a person with only this computer", () => vi.stubGlobal("window", desktopHere({ cloudAccount: { state: () => new Promise(() => {}), onState: () => () => {} } }))],
     ["This computer's rail, with My Cloud", () => vi.stubGlobal("window", desktopHere({ cloudAccount: { state: () => new Promise(() => {}), onState: () => () => {} }, workspaces: { state: () => new Promise(() => {}), places: () => new Promise(() => {}) } }))],
