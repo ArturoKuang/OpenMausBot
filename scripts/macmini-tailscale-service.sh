@@ -10,6 +10,7 @@ export OMB_COMPANION_PORT="${OMB_COMPANION_PORT:-8810}" OMB_CONTROL_PORT="${OMB_
 export OMB_COMPANION_NAME="${OMB_COMPANION_NAME:-macmini-ci}"
 export OMB_COMPANION_ROUTES=tailscale OMB_COMPANION_BONJOUR=0
 export OMB_COMPANION_TAILNET_NAME="${OMB_TAILNET_NAME:-}"
+if [ -d "$PWD/dist" ]; then export OMB_STATIC_DIR="${OMB_STATIC_DIR:-$PWD/dist}"; fi
 
 case "${1:-serve}" in
   serve)
